@@ -3,17 +3,19 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Neighborhood Project</title>
-  <link rel="stylesheet" href="assets/stylesheets/style.css">
+  <link rel="stylesheet" href="assets/stylesheets/main.css">
 </head>
 
 <body>
-  <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+
   <div id="map"></div>
-  <div id="list">
+  <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+
+  <div class="locations-list">
     <div class="search">
-      <input placeholder="Search…" class="form-control" type="search" data-bind="textInput: searchTerm, valueUpdate: 'keyup'">
-      </form>
+      <input placeholder="Filter locations..." class="form-control" type="text" data-bind="textInput: searchTerm, valueUpdate: 'keyup'">
     </div>
 
     <ul data-bind="foreach: search()">
@@ -26,6 +28,7 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBJt1lprwXeM8ZZstza9_VhZ9StZs1CM58&libraries=places"></script>
   <script src="assets/scripts/knockout-3.3.0.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="assets/scripts/oauth-signature.min.js"></script>
   <script src="assets/scripts/app.js"></script>
 </body>
 
