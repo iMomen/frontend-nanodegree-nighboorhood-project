@@ -1,45 +1,51 @@
 // A list of my prefered locations
 var myLocations = [{
-  name: "Alexis Bangsar",
-  zip: "59100",
-  address: "29 Jalan Telawi 3",
-  latlng: new google.maps.LatLng(3.13186, 101.67098),
+  name: "Regency Café",
+  id: 0,
+  address: "17-19 Regency Street Westminster London SW1P 4BY UK",
+  latlng: new google.maps.LatLng(51.4940143171, -0.13222007974201),
   marker: null
 }, {
-  name: "Bangsar Village Shopping Centre",
-  zip: "59101",
-  address: "Kuala Lumpur",
-  latlng: new google.maps.LatLng(3.13243, 101.67046),
+  name: "Mother Mash",
+  id: 1,
+  address: "26 Ganton Street Soho London W1F 7QZ UK",
+  latlng: new google.maps.LatLng(51.512935, -0.139414),
   marker: null
 }, {
-  name: "Damansara Heights",
-  zip: "50490",
-  address: "Kuala Lumpur",
-  latlng: new google.maps.LatLng(3.15219, 101.67090),
+  name: "Kappacasein",
+  id: 2,
+  address: "Stoney Street London Bridge London SE1 1TL UK",
+  latlng: new google.maps.LatLng(51.5050392, -0.09079),
   marker: null
 }, {
-  name: "Perdana Botanical Garden",
-  address: "Jalan Raja Abdullah",
-  zip: "50300",
-  latlng: new google.maps.LatLng(3.143, 101.68466),
+  name: "Dishoom",
+  id: 3,
+  address: "5 Stable Street King's Cross",
+  latlng: new google.maps.LatLng(51.5360442070729, -0.125712882621315),
   marker: null
 }, {
-  name: "Desa Park City",
-  address: "The Waterfront",
-  zip: "52200",
-  latlng: new google.maps.LatLng(3.18532, 101.6319984),
+  name: "E Pellicci",
+  id: 4,
+  address: "332 Bethnal Green Road",
+  latlng: new google.maps.LatLng(51.526530005795, -0.0634711028675383),
   marker: null
 }, {
-  name: "Restoran Kin Kin",
-  address: "40, Jalan Dewan Sultan Sulaiman, Kampung Baru",
-  zip: "50300",
-  latlng: new google.maps.LatLng(3.1606721, 101.6982911),
+  name: "The FRENCHIE",
+  id: 5,
+  address: "Camden Lock Market",
+  latlng: new google.maps.LatLng(51.5410638112118, -0.146470069885254),
   marker: null
 }, {
-  name: "VCR",
-  address: "2, Jalan Galloway, Bukit Bintang",
-  zip: "50150",
-  latlng: new google.maps.LatLng(3.143182, 101.705589),
+  name: "Pieminister",
+  id: 6,
+  address: "Gabriel's Wharf",
+  latlng: new google.maps.LatLng(51.507581, -0.109933),
+  marker: null
+}, {
+  name: "La Crêperie de Hampstead",
+  id: 7,
+  address: "77 Hampstead High Street",
+  latlng: new google.maps.LatLng(51.555682234589995, -0.17692025446204998),
   marker: null
 }];
 
@@ -59,26 +65,39 @@ var AppViewModel = function() {
   var self = this;
   var map;
   var marker;
-  var service;
-  var infowindow;
-  var placeLocation = [];
+  var infoWindow;
   self.points = ko.observableArray(myLocations);
 
-  var mapCenter = new google.maps.LatLng(3.10048, 101.42577);
+  var mapCenter = new google.maps.LatLng(51.50735, -0.12776);
 
   var markersArray = [];
 
   // initialize the map
   function initialize() {
+
     map = new google.maps.Map(document.getElementById('map'), {
       center: mapCenter,
-      zoom: 11
+      zoom: 9,
+      mapTypeControlOptions: {
+        style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+        position: google.maps.ControlPosition.LEFT_BOTTOM
+      },
+      zoomControlOptions: {
+        position: google.maps.ControlPosition.LEFT_BOTTOM,
+        style: google.maps.ZoomControlStyle.SMALL
+      },
+      streetViewControlOptions: {
+        position: google.maps.ControlPosition.LEFT_BOTTOM
+      }
     });
 
     // Create the search box and link it to the UI element.
     var input = document.getElementById('pac-input');
     var searchBox = new google.maps.places.SearchBox(input);
+
+    var menuToggle = document.getElementById('menu-toggle');
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(menuToggle);
 
     // Bias the SearchBox results towards current map's viewport.
     map.addListener('bounds_changed', function() {
@@ -87,19 +106,18 @@ var AppViewModel = function() {
 
     searchBox.addListener('places_changed', function() {
       var places = searchBox.getPlaces();
-      if (places.length == 0) {
+      if (places.length === 0) {
         return;
       }
       var bounds = new google.maps.LatLngBounds();
       places.forEach(function(place) {
-      var placeName = place.formatted_address;
-      self.getYelpData(placeName, 10);
-      if (place.geometry.viewport) {
-        bounds.union(place.geometry.viewport);
-      } else {
-        bounds.extend(place.geometry.location);
-      }
-    });
+        var placeName = place.formatted_address;
+        if (place.geometry.viewport) {
+          bounds.union(place.geometry.viewport);
+        } else {
+          bounds.extend(place.geometry.location);
+        }
+      });
       map.fitBounds(bounds);
     });
 
@@ -121,13 +139,12 @@ var AppViewModel = function() {
       icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
       name: place.name.toLowerCase(),
       position: place.latlng,
-      zip: place.zip,
+      id: place.id,
       animation: google.maps.Animation.DROP
     });
 
     google.maps.event.addListener(marker, 'click', function() {
       self.getYelpData(place.address, 1);
-      infoWindow.setContent(createContent(place));
       infoWindow.open(map, marker);
       marker.setAnimation(google.maps.Animation.DROP);
       map.panTo(marker.position);
@@ -147,7 +164,7 @@ var AppViewModel = function() {
     var marker;
 
     for (var e = 0; e < markersArray.length; e++) {
-      if (place.zip === markersArray[e].zip) {
+      if (place.id === markersArray[e].id) {
         marker = markersArray[e];
         break;
       }
@@ -170,7 +187,7 @@ var AppViewModel = function() {
     return ko.utils.arrayFilter(self.points(), function(point) {
 
       if (point.name.toLowerCase().indexOf(self.searchTerm().toLowerCase()) !== -1) {
-        if(point.marker) {
+        if (point.marker) {
           point.marker.setMap(map);
         }
       } else {
@@ -214,19 +231,18 @@ var AppViewModel = function() {
       cache: true,
       dataType: 'jsonp',
       success: function(results) {
-        placeLocation = results.businesses;
         var responseData = results.businesses[0];
         infoWindow.setContent(createContent(responseData));
       },
       error: function(error) {
-        console.log(error);
+        infoWindow.setContent("Yelp is not available at this time");
       }
     };
 
     $.ajax(settings);
-  }
+  };
 
   google.maps.event.addDomListener(window, 'load', initialize);
-}
+};
 
 ko.applyBindings(new AppViewModel());

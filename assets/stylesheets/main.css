@@ -54,7 +54,7 @@ p {
 
 
 /* Locations List */
-.locations-list {
+/*.locations-list {
   background-color: white;
   height: 100vh;
   overflow: auto;
@@ -62,7 +62,7 @@ p {
   position: absolute;
   right: 0;
   top: 0;
-}
+}*/
 .locations-list ul {
   padding: 0;
   list-style: none;
@@ -116,10 +116,4 @@ p {
 .infoWindow-content .review .review-content {
   float: left;
   width: 75%;
-}
-
-@media (max-width: 600px) {
-  .locations-list {
-    width: 35%;
-  }
 }
