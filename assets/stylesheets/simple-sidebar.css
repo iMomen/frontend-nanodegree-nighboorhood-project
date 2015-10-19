@@ -106,7 +106,11 @@
 
 @media(min-width:768px) {
     #wrapper {
-        padding-right: 250px;
+        /*padding-right: 250px;*/
+    }
+    #wrapper #menu-toggle {
+      top: 10px !important;
+      right: 250px !important;
     }
 
     #wrapper.toggled {

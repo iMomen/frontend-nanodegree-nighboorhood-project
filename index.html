@@ -12,41 +12,43 @@
 
 <body id="wrapper">
 
-      <!-- Page Content -->
-      <div id="page-content-wrapper">
-        <div id="map"></div>
-        <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Menu</a>
-        <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+  <!-- Page Content -->
+  <div id="page-content-wrapper">
+    <div id="map"></div>
+    <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Menu</a>
+    <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+  </div>
+  <!-- /#page-content-wrapper -->
+
+  <!-- Sidebar -->
+  <div id="sidebar-wrapper">
+    <div class="locations-list">
+      <div class="search">
+        <!-- Tip: Using the textInput binding will automatically update the observable as the user types. -->
+        <input placeholder="Filter locations..." class="form-control" type="text" data-bind="textInput: searchTerm">
       </div>
-      <!-- /#page-content-wrapper -->
 
-      <!-- Sidebar -->
-      <div id="sidebar-wrapper">
-        <div class="locations-list">
-          <div class="search">
-            <input placeholder="Filter locations..." class="form-control" type="text" data-bind="textInput: searchTerm, valueUpdate: 'keyup'">
-          </div>
+      <ul data-bind="foreach: search()">
+        <li data-bind="click: $parent.clickOnListItem">
+          <span data-bind="text: name"></span>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /#sidebar-wrapper -->
 
-          <ul data-bind="foreach: search()">
-            <li data-bind="click: $parent.clickOnListItem">
-              <span data-bind="text: name"></span>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <!-- /#sidebar-wrapper -->
-
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBJt1lprwXeM8ZZstza9_VhZ9StZs1CM58&libraries=places&callback=initialize" async defer></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
   <script src="assets/scripts/knockout-3.3.0.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   <script src="assets/scripts/bootstrap.min.js"></script>
-  <script src="assets/scripts/oauth-signature.min.js"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBJt1lprwXeM8ZZstza9_VhZ9StZs1CM58&libraries=places&callback=init"></script>
   <script src="assets/scripts/app.js"></script>
+  <script src="assets/scripts/oauth-signature.min.js"></script>
+
   <script>
-  $("#menu-toggle").click(function(e) {
+    $("#menu-toggle").click(function(e) {
       e.preventDefault();
       $("#wrapper").toggleClass("toggled");
-  });
+    });
   </script>
 </body>
 

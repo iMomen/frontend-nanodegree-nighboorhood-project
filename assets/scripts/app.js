@@ -3,51 +3,60 @@ var myLocations = [{
   name: "Regency Café",
   id: 0,
   address: "17-19 Regency Street Westminster London SW1P 4BY UK",
-  latlng: new google.maps.LatLng(51.4940143171, -0.13222007974201),
+  lat:51.4940143171,
+  lng:-0.13222007974201,
   marker: null
 }, {
   name: "Mother Mash",
   id: 1,
   address: "26 Ganton Street Soho London W1F 7QZ UK",
-  latlng: new google.maps.LatLng(51.512935, -0.139414),
+  lat:51.512935,
+  lng:-0.139414,
   marker: null
 }, {
   name: "Kappacasein",
   id: 2,
   address: "Stoney Street London Bridge London SE1 1TL UK",
-  latlng: new google.maps.LatLng(51.5050392, -0.09079),
+  lat:51.5050392,
+  lng:-0.09079,
   marker: null
 }, {
   name: "Dishoom",
   id: 3,
   address: "5 Stable Street King's Cross",
-  latlng: new google.maps.LatLng(51.5360442070729, -0.125712882621315),
+  lat:51.5360442070729,
+  lng:-0.125712882621315,
   marker: null
 }, {
   name: "E Pellicci",
   id: 4,
   address: "332 Bethnal Green Road",
-  latlng: new google.maps.LatLng(51.526530005795, -0.0634711028675383),
+  lat:51.526530005795,
+  lng:-0.0634711028675383,
   marker: null
 }, {
   name: "The FRENCHIE",
   id: 5,
   address: "Camden Lock Market",
-  latlng: new google.maps.LatLng(51.5410638112118, -0.146470069885254),
+  lat:51.5410638112118,
+  lng:-0.146470069885254,
   marker: null
 }, {
   name: "Pieminister",
   id: 6,
   address: "Gabriel's Wharf",
-  latlng: new google.maps.LatLng(51.507581, -0.109933),
+  lat:51.507581,
+  lng:-0.109933,
   marker: null
 }, {
   name: "La Crêperie de Hampstead",
   id: 7,
   address: "77 Hampstead High Street",
-  latlng: new google.maps.LatLng(51.555682234589995, -0.17692025446204998),
+  lat:51.555682234589995,
+  lng:-0.17692025446204998,
   marker: null
 }];
+
 
 // Create infoWindow content
 function createContent(place) {
@@ -64,7 +73,6 @@ function createContent(place) {
 var AppViewModel = function() {
   var self = this;
   var map;
-  var marker;
   var infoWindow;
   self.points = ko.observableArray(myLocations);
 
@@ -100,6 +108,13 @@ var AppViewModel = function() {
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(menuToggle);
 
     // Bias the SearchBox results towards current map's viewport.
+    var bounds = new google.maps.LatLngBounds();
+    for (var i = 0; i < myLocations.length; i++) {
+      var placeLatLng = new google.maps.LatLng(myLocations[i].lat, myLocations[i].lng);
+      bounds.extend(placeLatLng);
+    }
+    map.fitBounds(bounds);
+
     map.addListener('bounds_changed', function() {
       searchBox.setBounds(map.getBounds());
     });
@@ -123,22 +138,22 @@ var AppViewModel = function() {
 
     infoWindow = new google.maps.InfoWindow();
     var place;
-    var i;
 
     for (i = 0; i < self.points().length; i++) {
       place = self.points()[i];
       createMarker(place);
     }
-
   }
+  initialize();
 
   // Create marker for every place on myLocations array
   function createMarker(place) {
-    marker = new google.maps.Marker({
+    // I don't know why it was acting like this on your end .. it was working normally here :)
+    var marker = new google.maps.Marker({
       map: map,
       icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
       name: place.name.toLowerCase(),
-      position: place.latlng,
+      position: new google.maps.LatLng(place.lat, place.lng),
       id: place.id,
       animation: google.maps.Animation.DROP
     });
@@ -146,7 +161,7 @@ var AppViewModel = function() {
     google.maps.event.addListener(marker, 'click', function() {
       self.getYelpData(place.address, 1);
       infoWindow.open(map, marker);
-      marker.setAnimation(google.maps.Animation.DROP);
+      marker.setAnimation(google.maps.Animation.BOUNCE);
       map.panTo(marker.position);
       setTimeout(function() {
         marker.setAnimation(null);
@@ -160,28 +175,11 @@ var AppViewModel = function() {
 
   // Click on list items
   self.clickOnListItem = function(place) {
-
-    var marker;
-
-    for (var e = 0; e < markersArray.length; e++) {
-      if (place.id === markersArray[e].id) {
-        marker = markersArray[e];
-        break;
-      }
-    }
-    map.panTo(marker.position);
-    self.getYelpData(place.address, 1);
-    infoWindow.open(map, marker);
-    marker.setAnimation(google.maps.Animation.DROP);
+    // ooh :D .. what a change .. Thanks :)
+    google.maps.event.trigger(place.marker, 'click');
   };
 
   self.searchTerm = ko.observable('');
-
-  self.search = ko.computed(function() {
-    return ko.utils.arrayFilter(self.points(), function(point) {
-      return (point.name.toLowerCase().indexOf(self.searchTerm().toLowerCase()) >= 0);
-    });
-  });
 
   self.search = ko.computed(function() {
     return ko.utils.arrayFilter(self.points(), function(point) {
@@ -241,8 +239,8 @@ var AppViewModel = function() {
 
     $.ajax(settings);
   };
-
-  google.maps.event.addDomListener(window, 'load', initialize);
 };
 
-ko.applyBindings(new AppViewModel());
+var init = function() {
+  ko.applyBindings(new AppViewModel());
+};
